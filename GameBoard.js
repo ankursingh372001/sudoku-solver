@@ -68,7 +68,9 @@ class GameBoard {
 			}
 		}
 
-		if (this.solveSudokuUtil(board, 0, 0)) {
+		if (!this.isInputSudokuValid(board, n)) {
+			alert("invalid sudoku");
+		} else if (this.solveSudokuUtil(board, 0, 0)) {
 			for (let r = 0; r < n; ++r) {
 				for (let c = 0; c < n; ++c) {
 					this.#cells[r][c].cellElement.classList.remove("active");
@@ -136,6 +138,56 @@ class GameBoard {
 		return true;
 	}
 
+	isInputSudokuValid(board, n) {
+		// check every row
+		for (let i = 0; i < n; ++i) {
+			const values = [];
+
+			for (let j = 0; j < n; ++j) {
+				if (board[i][j] > 0 && values.indexOf(board[i][j]) !== -1) {
+					return false;
+				}
+
+				values.push(board[i][j]);
+			}
+		}
+
+		// check every column
+		for (let j = 0; j < n; ++j) {
+			const values = [];
+
+			for (let i = 0; i < n; ++i) {
+				if (board[i][j] > 0 && values.indexOf(board[i][j]) !== -1) {
+					return false;
+				}
+
+				values.push(board[i][j]);
+			}
+		}
+
+		// check every cell groups
+		for (let r = 1; r < n; r += 3) {
+			for (let c = 1; c < n; c += 3) {
+				const values = [];
+
+				for (let dr = -1; dr <= 1; ++dr) {
+					for (let dc = -1; dc <= 1; ++dc) {
+						const R = r + dr;
+						const C = c + dc;
+
+						if (board[R][C] > 0 && values.indexOf(board[R][C]) !== -1) {
+							return false;
+						}
+
+						values.push(board[R][C]);
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
 	fillActiveCell(value) {
 		const n = this.#gameboardSize;
 		const cells = this.#cells;
@@ -154,8 +206,6 @@ class GameBoard {
 	clearFilledCell() {
 		const n = this.#gameboardSize;
 		const cells = this.#cells;
-
-		console.log("hello world");
 
 		for (let r = 0; r < n; ++r) {
 			for (let c = 0; c < n; ++c) {
